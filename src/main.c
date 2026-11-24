@@ -168,6 +168,7 @@ static void initialize_wifi(void)
 #define FIREBASE_URL_MAX   1800
 #define POLL_INTERVAL_MS   2000
 #define SIGN_IN_RETRY_MS   10000
+#define REFRESH_MARGIN_S   300
 
 static char http_response[HTTP_RESPONSE_MAX];
 static int http_response_len = 0;
@@ -175,6 +176,9 @@ static int http_response_len = 0;
 static char firebase_id_token[ID_TOKEN_MAX];
 static char firebase_refresh_token[REFRESH_TOKEN_MAX];
 static int firebase_token_lifetime_s = 0;
+static TickType_t firebase_token_obtained_tick = 0;
+
+static int last_db_http_status = 0;
 
 static char firebase_url[FIREBASE_URL_MAX];
 
@@ -259,6 +263,7 @@ static esp_err_t firebase_sign_in(void)
                     snprintf(firebase_refresh_token, sizeof(firebase_refresh_token),
                              "%s", refresh->valuestring);
                     firebase_token_lifetime_s = atoi(expires->valuestring);
+                    firebase_token_obtained_tick = xTaskGetTickCount();
                     result = ESP_OK;
                 } else {
                     ESP_LOGE(TAG, "Firebase reply is missing expected fields.");
@@ -273,6 +278,90 @@ static esp_err_t firebase_sign_in(void)
     return result;
 }
 
+/* Gets a new ID token using the refresh token (Firebase Auth REST API).
+   Tokens are never printed. */
+static esp_err_t firebase_refresh_session(void)
+{
+    esp_err_t result = ESP_FAIL;
+
+    http_response_len = 0;
+    http_response[0] = '\0';
+
+    char body[REFRESH_TOKEN_MAX + 64];
+    int n = snprintf(body, sizeof(body),
+                     "grant_type=refresh_token&refresh_token=%s",
+                     firebase_refresh_token);
+    if (n < 0 || n >= (int)sizeof(body)) {
+        return ESP_ERR_INVALID_SIZE;
+    }
+
+    esp_http_client_config_t config = {
+        .url = "https://securetoken.googleapis.com/v1/token?key=" FIREBASE_API_KEY,
+        .method = HTTP_METHOD_POST,
+        .event_handler = http_event_handler,
+        .crt_bundle_attach = esp_crt_bundle_attach,
+        .timeout_ms = 10000,
+    };
+
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    if (client == NULL) {
+        return ESP_FAIL;
+    }
+
+    esp_http_client_set_header(client, "Content-Type",
+                               "application/x-www-form-urlencoded");
+    esp_http_client_set_post_field(client, body, strlen(body));
+
+    esp_err_t err = esp_http_client_perform(client);
+
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Token refresh request failed: %s", esp_err_to_name(err));
+    } else {
+        int status = esp_http_client_get_status_code(client);
+
+        if (status != 200) {
+            ESP_LOGE(TAG, "Token refresh HTTP status: %d", status);
+        } else {
+            cJSON *root = cJSON_Parse(http_response);
+            if (root == NULL) {
+                ESP_LOGE(TAG, "Could not parse token refresh reply.");
+            } else {
+                cJSON *id = cJSON_GetObjectItem(root, "id_token");
+                cJSON *refresh = cJSON_GetObjectItem(root, "refresh_token");
+                cJSON *expires = cJSON_GetObjectItem(root, "expires_in");
+
+                if (cJSON_IsString(id) && cJSON_IsString(refresh) &&
+                    cJSON_IsString(expires) &&
+                    strlen(id->valuestring) < ID_TOKEN_MAX &&
+                    strlen(refresh->valuestring) < REFRESH_TOKEN_MAX) {
+
+                    snprintf(firebase_id_token, sizeof(firebase_id_token),
+                             "%s", id->valuestring);
+                    snprintf(firebase_refresh_token, sizeof(firebase_refresh_token),
+                             "%s", refresh->valuestring);
+                    firebase_token_lifetime_s = atoi(expires->valuestring);
+                    firebase_token_obtained_tick = xTaskGetTickCount();
+                    result = ESP_OK;
+                } else {
+                    ESP_LOGE(TAG, "Token refresh reply is missing expected fields.");
+                }
+                cJSON_Delete(root);
+            }
+        }
+    }
+
+    esp_http_client_cleanup(client);
+    return result;
+}
+
+static bool token_needs_refresh(void)
+{
+    uint32_t age_s = ((uint32_t)(xTaskGetTickCount() - firebase_token_obtained_tick)
+                      * portTICK_PERIOD_MS) / 1000;
+
+    return (int)age_s >= (firebase_token_lifetime_s - REFRESH_MARGIN_S);
+}
+
 /* Reads /fan/powerlevel from the Realtime Database (REST API).
    The URL contains the token, so it is never printed. */
 static esp_err_t firebase_read_power_level(int *level_out)
@@ -281,6 +370,7 @@ static esp_err_t firebase_read_power_level(int *level_out)
 
     http_response_len = 0;
     http_response[0] = '\0';
+    last_db_http_status = 0;
 
     size_t base_len = strlen(FIREBASE_DATABASE_URL);
     while (base_len > 0 && FIREBASE_DATABASE_URL[base_len - 1] == '/') {
@@ -315,6 +405,7 @@ static esp_err_t firebase_read_power_level(int *level_out)
         ESP_LOGE(TAG, "Database request failed: %s", esp_err_to_name(err));
     } else {
         int status = esp_http_client_get_status_code(client);
+        last_db_http_status = status;
 
         if (status != 200) {
             ESP_LOGE(TAG, "Database HTTP status: %d", status);
@@ -371,6 +462,25 @@ static void firebase_task(void *pvParameters)
             portMAX_DELAY
         );
 
+        if (token_needs_refresh()) {
+            ESP_LOGI(TAG, "Refreshing Firebase token...");
+
+            if (firebase_refresh_session() == ESP_OK) {
+                ESP_LOGI(TAG, "Token refreshed. Valid for %d seconds.",
+                         firebase_token_lifetime_s);
+            } else {
+                ESP_LOGW(TAG, "Token refresh failed. Signing in again...");
+
+                if (firebase_sign_in() == ESP_OK) {
+                    ESP_LOGI(TAG, "Signed in again.");
+                } else {
+                    ESP_LOGE(TAG, "Sign-in failed. Will retry.");
+                    vTaskDelay(pdMS_TO_TICKS(SIGN_IN_RETRY_MS));
+                    continue;
+                }
+            }
+        }
+
         int level = 0;
 
         if (firebase_read_power_level(&level) == ESP_OK) {
@@ -381,6 +491,14 @@ static void firebase_task(void *pvParameters)
                     ESP_LOGW(TAG, "Ignoring invalid value from Firebase: %d", level);
                 }
                 last_level = level;
+            }
+        } else if (last_db_http_status == 401) {
+            ESP_LOGW(TAG, "Database rejected the token. Signing in again...");
+
+            if (firebase_sign_in() != ESP_OK) {
+                ESP_LOGE(TAG, "Sign-in failed. Will retry.");
+                vTaskDelay(pdMS_TO_TICKS(SIGN_IN_RETRY_MS));
+                continue;
             }
         }
 
