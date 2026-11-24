@@ -160,3 +160,13 @@ Not done. No static analysis tool has been run on the firmware yet.
 - **Secret management:** Wi-Fi credentials and Firebase configuration files are excluded from GitHub using `.gitignore`. Example templates are provided for configuration.
 - **cJSON dependency:** cJSON is included as a managed component because ESP-IDF 6 removed the built-in JSON component.
 
+
+## Limitations
+
+- The ESP32 firmware has not been tested on actual hardware because the board was unavailable during development.
+- The ESP32 stores an account email and password in its firmware. Anyone with physical access to the flash memory could potentially retrieve these credentials.
+- The two-second polling interval can introduce up to approximately two seconds of delay before the ESP32 detects a database change.
+- The firmware uses approximately 94.6% of the 1 MB application flash partition.
+- Voice control requires a supported browser such as Google Chrome or Microsoft Edge and an internet connection. Chrome sends audio to Google for speech recognition.
+- Only two authenticated accounts are authorized to control the fan.
+
