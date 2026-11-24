@@ -131,3 +131,8 @@ Not done. No Wokwi simulation was created for this project.
 
 Not done. No automated unit tests have been written yet.
 
+
+## Static Code Analysis
+
+Not done. No static analysis tool has been run on the firmware yet.
+
