@@ -1,0 +1,13 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "fan": {
+      "powerlevel": {
+        ".read": "auth != null && (auth.uid === 'UID_ONE' || auth.uid === 'UID_TWO')",
+        ".write": "auth != null && (auth.uid === 'UID_ONE' || auth.uid === 'UID_TWO')",
+        ".validate": "newData.isNumber() && (newData.val() === 0 || newData.val() === 33 || newData.val() === 66 || newData.val() === 100)"
+      }
+    }
+  }
+}
