@@ -1,0 +1,180 @@
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  margin: 16px;
+  padding: 28px 24px;
+  text-align: center;
+  background: #1e293b;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: 1.6rem;
+}
+
+.hint {
+  margin: 0 0 12px;
+  color: #94a3b8;
+}
+
+/* ---------- Login form ---------- */
+#login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input {
+  padding: 12px;
+  font-size: 1rem;
+  color: #e2e8f0;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+}
+
+input:focus {
+  outline: 2px solid #38bdf8;
+  border-color: transparent;
+}
+
+button {
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.primary {
+  padding: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  background: #38bdf8;
+  border: none;
+  border-radius: 10px;
+}
+
+.primary:hover {
+  background: #7dd3fc;
+}
+
+.link-btn {
+  margin-top: 14px;
+  color: #94a3b8;
+  background: none;
+  border: none;
+  text-decoration: underline;
+}
+
+.error {
+  min-height: 1.2em;
+  margin: 10px 0 0;
+  color: #f87171;
+  font-size: 0.9rem;
+}
+
+/* ---------- Fan ---------- */
+.fan-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 12px;
+}
+
+.fan {
+  width: 200px;
+  height: 200px;
+}
+
+.blade {
+  fill: #38bdf8;
+  fill-opacity: 0.85;
+  stroke: #0ea5e9;
+  stroke-width: 2;
+}
+
+.hub {
+  fill: #f1f5f9;
+  stroke: #94a3b8;
+  stroke-width: 3;
+}
+
+/* The blades spin around the center of the SVG (0,0). */
+.blades {
+  transform-origin: 0 0;
+  animation: spin 1s linear infinite;
+  animation-play-state: paused;
+}
+
+/* The JavaScript puts one of these classes on the <svg id="fan">. */
+.fan.speed-0 .blades   { animation-play-state: paused; }
+.fan.speed-33 .blades  { animation-duration: 2s;   animation-play-state: running; }
+.fan.speed-66 .blades  { animation-duration: 1s;   animation-play-state: running; }
+.fan.speed-100 .blades { animation-duration: 0.4s; animation-play-state: running; }
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.status {
+  margin: 0 0 16px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+/* ---------- Speed buttons ---------- */
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.speed-btn {
+  padding: 14px 8px;
+  font-weight: 600;
+  color: #e2e8f0;
+  background: #334155;
+  border: 2px solid transparent;
+  border-radius: 12px;
+}
+
+.speed-btn:hover {
+  background: #475569;
+}
+
+.speed-btn.active {
+  color: #0f172a;
+  background: #38bdf8;
+  border-color: #7dd3fc;
+}
+
+.speed-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blades {
+    animation-play-state: paused !important;
+  }
+}

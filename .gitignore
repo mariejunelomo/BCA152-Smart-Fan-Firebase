@@ -5,3 +5,5 @@ sdkconfig.*
 src/secrets.h
 
 managed_components/
+
+web/firebase-config.js

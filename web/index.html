@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Fan Voice Control</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <h1>Smart Fan</h1>
+
+    <!-- Login section: shown when nobody is signed in -->
+    <section id="login-section">
+      <p class="hint">Sign in to control the fan.</p>
+      <form id="login-form">
+        <input id="email" type="email" placeholder="Email" autocomplete="username" required>
+        <input id="password" type="password" placeholder="Password" autocomplete="current-password" required>
+        <button type="submit" class="primary">Sign in</button>
+      </form>
+      <p id="login-error" class="error" role="alert"></p>
+    </section>
+
+    <!-- Control section: shown after signing in -->
+    <section id="control-section" hidden>
+      <div class="fan-wrap">
+        <svg id="fan" class="fan" viewBox="-100 -100 200 200" aria-label="Fan">
+          <g class="blades">
+            <path class="blade" d="M0 0 C -22 -30, -18 -80, 0 -88 C 18 -80, 22 -30, 0 0 Z"/>
+            <path class="blade" d="M0 0 C -22 -30, -18 -80, 0 -88 C 18 -80, 22 -30, 0 0 Z" transform="rotate(90)"/>
+            <path class="blade" d="M0 0 C -22 -30, -18 -80, 0 -88 C 18 -80, 22 -30, 0 0 Z" transform="rotate(180)"/>
+            <path class="blade" d="M0 0 C -22 -30, -18 -80, 0 -88 C 18 -80, 22 -30, 0 0 Z" transform="rotate(270)"/>
+          </g>
+          <circle class="hub" r="12"/>
+        </svg>
+      </div>
+
+      <p id="status" class="status">Fan: connecting...</p>
+
+      <div class="buttons">
+        <button type="button" class="speed-btn" data-level="0">OFF</button>
+        <button type="button" class="speed-btn" data-level="33">LOW</button>
+        <button type="button" class="speed-btn" data-level="66">NORMAL</button>
+        <button type="button" class="speed-btn" data-level="100">HIGH</button>
+      </div>
+
+      <p id="control-error" class="error" role="alert"></p>
+      <button id="logout-btn" type="button" class="link-btn">Sign out</button>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
