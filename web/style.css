@@ -1,3 +1,4 @@
+
 * {
   box-sizing: border-box;
 }
@@ -12,50 +13,71 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: #0f172a;
-  color: #e2e8f0;
+  padding: 20px;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: linear-gradient(135deg, #ffe4ef, #fff0f5, #fce7f3);
+  color: #75445a;
 }
 
 .card {
+  position: relative;
   width: 100%;
-  max-width: 380px;
+  max-width: 390px;
   margin: 16px;
-  padding: 28px 24px;
+  padding: 32px 26px;
   text-align: center;
-  background: #1e293b;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.94);
+  border: 2px solid #f9c9dc;
+  border-radius: 28px;
+  box-shadow: 0 15px 40px rgba(214, 112, 155, 0.18);
+}
+
+.card::before {
+  content: "♡ ୨୧ ♡";
+  display: block;
+  margin-bottom: 10px;
+  color: #e88bad;
+  font-size: 20px;
+  letter-spacing: 5px;
 }
 
 h1 {
   margin: 0 0 16px;
-  font-size: 1.6rem;
+  color: #c75d88;
+  font-family: Georgia, serif;
+  font-size: 2rem;
+  letter-spacing: 1px;
 }
 
 .hint {
-  margin: 0 0 12px;
-  color: #94a3b8;
+  margin: 0 0 16px;
+  color: #a77b8e;
 }
 
-/* ---------- Login form ---------- */
+/* Login form */
+
 #login-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 input {
-  padding: 12px;
+  width: 100%;
+  padding: 13px;
   font-size: 1rem;
-  color: #e2e8f0;
-  background: #0f172a;
-  border: 1px solid #334155;
-  border-radius: 10px;
+  color: #75445a;
+  background: #fff8fb;
+  border: 1px solid #f3c5d8;
+  border-radius: 14px;
+}
+
+input::placeholder {
+  color: #c99aaa;
 }
 
 input:focus {
-  outline: 2px solid #38bdf8;
+  outline: 2px solid #e99bb9;
   border-color: transparent;
 }
 
@@ -63,24 +85,27 @@ button {
   font-family: inherit;
   font-size: 1rem;
   cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 
 .primary {
-  padding: 12px;
-  font-weight: 600;
-  color: #0f172a;
-  background: #38bdf8;
+  padding: 13px;
+  font-weight: 700;
+  color: white;
+  background: #df82a7;
   border: none;
-  border-radius: 10px;
+  border-radius: 14px;
+  box-shadow: 0 5px 12px rgba(223, 130, 167, 0.25);
 }
 
 .primary:hover {
-  background: #7dd3fc;
+  background: #d96e98;
+  transform: translateY(-2px);
 }
 
 .link-btn {
-  margin-top: 14px;
-  color: #94a3b8;
+  margin-top: 16px;
+  color: #c36d91;
   background: none;
   border: none;
   text-decoration: underline;
@@ -89,83 +114,106 @@ button {
 .error {
   min-height: 1.2em;
   margin: 10px 0 0;
-  color: #f87171;
+  color: #d94f78;
   font-size: 0.9rem;
 }
 
-/* ---------- Fan ---------- */
+/* Fan illustration */
+
 .fan-wrap {
   display: flex;
   justify-content: center;
-  margin: 8px 0 12px;
+  margin: 12px 0 18px;
 }
 
 .fan {
-  width: 200px;
-  height: 200px;
+  width: 210px;
+  height: 210px;
+  filter: drop-shadow(0 8px 8px rgba(213, 113, 151, 0.15));
 }
 
 .blade {
-  fill: #38bdf8;
-  fill-opacity: 0.85;
-  stroke: #0ea5e9;
+  fill: #f5a9c5;
+  fill-opacity: 0.9;
+  stroke: #df7fa5;
   stroke-width: 2;
 }
 
 .hub {
-  fill: #f1f5f9;
-  stroke: #94a3b8;
+  fill: #fff0f6;
+  stroke: #d9789e;
   stroke-width: 3;
 }
 
-/* The blades spin around the center of the SVG (0,0). */
+/* Fan rotation */
+
 .blades {
   transform-origin: 0 0;
   animation: spin 1s linear infinite;
   animation-play-state: paused;
 }
 
-/* The JavaScript puts one of these classes on the <svg id="fan">. */
-.fan.speed-0 .blades   { animation-play-state: paused; }
-.fan.speed-33 .blades  { animation-duration: 2s;   animation-play-state: running; }
-.fan.speed-66 .blades  { animation-duration: 1s;   animation-play-state: running; }
-.fan.speed-100 .blades { animation-duration: 0.4s; animation-play-state: running; }
+.fan.speed-0 .blades {
+  animation-play-state: paused;
+}
+
+.fan.speed-33 .blades {
+  animation-duration: 2s;
+  animation-play-state: running;
+}
+
+.fan.speed-66 .blades {
+  animation-duration: 1s;
+  animation-play-state: running;
+}
+
+.fan.speed-100 .blades {
+  animation-duration: 0.4s;
+  animation-play-state: running;
+}
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .status {
-  margin: 0 0 16px;
-  font-weight: 600;
-  color: #cbd5e1;
+  margin: 0 0 18px;
+  font-weight: 700;
+  color: #bd6288;
 }
 
-/* ---------- Speed buttons ---------- */
+/* Fan speed buttons */
+
 .buttons {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
 }
 
 .speed-btn {
   padding: 14px 8px;
-  font-weight: 600;
-  color: #e2e8f0;
-  background: #334155;
-  border: 2px solid transparent;
-  border-radius: 12px;
+  font-weight: 700;
+  color: #b45e82;
+  background: #fff0f6;
+  border: 2px solid #f3c4d8;
+  border-radius: 15px;
 }
 
 .speed-btn:hover {
-  background: #475569;
+  background: #fce0ec;
+  transform: translateY(-2px);
 }
 
 .speed-btn.active {
-  color: #0f172a;
-  background: #38bdf8;
-  border-color: #7dd3fc;
+  color: white;
+  background: #d9789e;
+  border-color: #d9789e;
+  box-shadow: 0 5px 12px rgba(217, 120, 158, 0.25);
 }
 
 .speed-btn:disabled {
@@ -173,30 +221,27 @@ button {
   cursor: wait;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .blades {
-    animation-play-state: paused !important;
-  }
-}
+/* Voice control */
 
-/* ---------- Voice control ---------- */
 .mic-btn {
   width: 100%;
-  margin-top: 14px;
+  margin-top: 16px;
   padding: 14px;
-  font-weight: 600;
-  color: #e2e8f0;
-  background: #7c3aed;
+  font-weight: 700;
+  color: white;
+  background: #c77cae;
   border: none;
-  border-radius: 12px;
+  border-radius: 15px;
+  box-shadow: 0 5px 12px rgba(199, 124, 174, 0.2);
 }
 
 .mic-btn:hover {
-  background: #8b5cf6;
+  background: #b9689e;
+  transform: translateY(-2px);
 }
 
 .mic-btn.listening {
-  background: #dc2626;
+  background: #e46c91;
   animation: pulse 1.2s ease-in-out infinite;
 }
 
@@ -206,13 +251,38 @@ button {
 }
 
 @keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
-  50%      { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(228, 108, 145, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(228, 108, 145, 0);
+  }
 }
 
 .voice-feedback {
   min-height: 1.2em;
   margin: 10px 0 0;
-  color: #cbd5e1;
+  color: #ad718d;
   font-size: 0.9rem;
+}
+
+@media (max-width: 420px) {
+  .card {
+    padding: 26px 20px;
+  }
+
+  .fan {
+    width: 185px;
+    height: 185px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blades {
+    animation-play-state: paused !important;
+  }
+
+  button {
+    transition: none;
+  }
 }
