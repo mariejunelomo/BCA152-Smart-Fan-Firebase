@@ -170,3 +170,14 @@ Not done. No static analysis tool has been run on the firmware yet.
 - Voice control requires a supported browser such as Google Chrome or Microsoft Edge and an internet connection. Chrome sends audio to Google for speech recognition.
 - Only two authenticated accounts are authorized to control the fan.
 
+
+## Future Improvements
+
+- Test the firmware on the actual ESP32-S3 board and document the hardware testing results.
+- Create a Wokwi simulation to demonstrate the system without requiring physical hardware.
+- Add automated unit tests for important firmware functions.
+- Run static code analysis to identify potential code quality and reliability issues.
+- Use a dedicated Firebase account for the ESP32 instead of storing a personal account's credentials in the firmware.
+- Replace periodic database polling with a real-time update approach to reduce unnecessary requests and response delays.
+- Optimize the firmware and consider a larger application partition if additional features are introduced.
+
