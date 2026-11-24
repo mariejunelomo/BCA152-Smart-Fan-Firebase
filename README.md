@@ -67,3 +67,7 @@ The LED circuit has not been built yet, because no hardware was available during
 | `app_main` | Initializes NVS, LEDs and Wi-Fi, creates `firebase_task`, then returns |
 | `wifi_event_handler` | Connects, reconnects on disconnect, logs the IP address, sets or clears the connected flag |
 | `firebase_task` | Waits for Wi-Fi, signs in, polls `/fan/powerlevel` every 2 seconds, refreshes the token, and updates the LEDs |
+
+## Inter-Task Communication
+
+A FreeRTOS event group (`wifi_event_group`) with the bit `WIFI_CONNECTED_BIT` links the Wi-Fi event handler and `firebase_task`. The handler sets the bit when the ESP32 gets an IP address and clears it when Wi-Fi disconnects. `firebase_task` waits on the bit before it makes any network request.
