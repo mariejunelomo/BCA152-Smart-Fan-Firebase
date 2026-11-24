@@ -121,3 +121,8 @@ To run the web page locally:
 ```
 
 Then open `http://localhost:8000` in Chrome or Edge.
+
+## Running the Wokwi Simulation
+
+Not done. No Wokwi simulation was created for this project.
+
