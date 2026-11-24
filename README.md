@@ -83,3 +83,17 @@ WAIT_FOR_WIFI --> SIGN_IN --> POLL (read /fan/powerlevel every 2 s, update LEDs)
 ```
 
 If Wi-Fi drops, the task waits for the connected bit again before making the next request.
+
+## Repository Structure
+
+| Path | Purpose |
+|---|---|
+| `src/main.c` | ESP32 firmware |
+| `src/CMakeLists.txt` | Firmware component settings |
+| `src/idf_component.yml` | Requests the cJSON component (ESP-IDF 6 no longer includes it) |
+| `src/secrets.h.example` | Template for Wi-Fi and Firebase values (real `src/secrets.h` is ignored by Git) |
+| `dependencies.lock` | Locked version of the cJSON component |
+| `web/index.html`, `web/style.css`, `web/app.js` | Web page |
+| `web/firebase-config.example.js` | Template for the Firebase web settings (real `web/firebase-config.js` is ignored by Git) |
+| `database.rules.example.json` | Example Realtime Database rules |
+| `platformio.ini` | PlatformIO settings (ESP-IDF framework only) |
