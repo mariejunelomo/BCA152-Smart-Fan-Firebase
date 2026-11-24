@@ -97,3 +97,11 @@ If Wi-Fi drops, the task waits for the connected bit again before making the nex
 | `web/firebase-config.example.js` | Template for the Firebase web settings (real `web/firebase-config.js` is ignored by Git) |
 | `database.rules.example.json` | Example Realtime Database rules |
 | `platformio.ini` | PlatformIO settings (ESP-IDF framework only) |
+
+## Getting Started
+
+1. Create a Firebase project with a Realtime Database, enable Email/Password sign-in, register a Web App, and create two user accounts.
+2. Create `/fan/powerlevel` in the database with the value `0`.
+3. Copy `database.rules.example.json` into the database Rules tab and replace `UID_ONE` and `UID_TWO` with the User UIDs of your two accounts.
+4. Copy `src/secrets.h.example` to `src/secrets.h` and fill in your Wi-Fi name and password, Firebase Web API key, database URL, and the email and password of one allowed account.
+5. Copy `web/firebase-config.example.js` to `web/firebase-config.js` and fill in the values from Firebase Project settings, Your apps, Config. The first line must be `export const firebaseConfig = {`.
