@@ -3,3 +3,5 @@ sdkconfig.*
 !sdkconfig.defaults
 
 src/secrets.h
+
+managed_components/
