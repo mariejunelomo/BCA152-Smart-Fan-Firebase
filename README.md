@@ -39,3 +39,14 @@ Web page (buttons / microphone)  --writes-->  Firebase Realtime Database  <--rea
 - ESP-IDF runs `app_main()`, which sets up NVS, the LEDs and Wi-Fi, then creates one application task, `firebase_task`.
 - Wi-Fi and IP events are handled by the ESP-IDF default event loop through `wifi_event_handler`.
 - `firebase_task` has an 8192-byte stack and priority 5. It needs the larger stack because HTTPS (TLS) uses a lot of memory.
+
+## Hardware / Simulated Components
+
+| Component | Purpose |
+|---|---|
+| ESP32-S3 DevKitC-1 | Microcontroller with Wi-Fi |
+| 3 LEDs | Simulate LOW, NORMAL and HIGH fan speed |
+| Web browser (Chrome or Edge) | Control page and voice input |
+| Firebase (Authentication and Realtime Database) | Cloud link between the web page and the ESP32 |
+
+The LED circuit has not been built yet, because no hardware was available during development.
