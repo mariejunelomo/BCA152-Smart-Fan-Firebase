@@ -149,3 +149,14 @@ Not done. No static analysis tool has been run on the firmware yet.
 | ESP32 Wi-Fi, Firebase sign-in, database reading, and LED control | Not tested (hardware unavailable) |
 | ESP32 authentication token refresh after approximately one hour | Not tested (hardware unavailable) |
 
+
+## Engineering Decisions
+
+- **Firebase instead of AWS and Alexa:** Firebase was used instead of AWS IoT Core and AWS Lambda, with the instructor's approval. Browser-based voice recognition using the Web Speech API replaces Alexa.
+- **REST API over HTTPS:** The ESP32 communicates with Firebase using HTTPS REST APIs instead of a Firebase C++ SDK to maintain compatibility with the ESP-IDF-only requirement.
+- **Two-second polling interval:** The ESP32 checks the Realtime Database every two seconds. This approach is simple to implement and explain.
+- **Restricted database access:** Database rules allow only two specific authenticated User UIDs to read and write the fan power level. The Firebase Web API key is not treated as a secret, and public sign-up may be available.
+- **Accepted power levels:** The database accepts only 0, 33, 66, and 100. The firmware also ignores invalid power-level values.
+- **Secret management:** Wi-Fi credentials and Firebase configuration files are excluded from GitHub using `.gitignore`. Example templates are provided for configuration.
+- **cJSON dependency:** cJSON is included as a managed component because ESP-IDF 6 removed the built-in JSON component.
+
