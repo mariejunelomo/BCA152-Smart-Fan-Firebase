@@ -33,3 +33,9 @@ Web page (buttons / microphone)  --writes-->  Firebase Realtime Database  <--rea
 - The web page signs in with the Firebase Web SDK and writes `/fan/powerlevel`.
 - The ESP32 signs in with the Firebase Authentication REST API, then reads `/fan/powerlevel` over HTTPS every 2 seconds using the Realtime Database REST API.
 - The database rules decide who may read and write.
+
+## FreeRTOS Architecture
+
+- ESP-IDF runs `app_main()`, which sets up NVS, the LEDs and Wi-Fi, then creates one application task, `firebase_task`.
+- Wi-Fi and IP events are handled by the ESP-IDF default event loop through `wifi_event_handler`.
+- `firebase_task` has an 8192-byte stack and priority 5. It needs the larger stack because HTTPS (TLS) uses a lot of memory.
