@@ -181,3 +181,14 @@ Not done. No static analysis tool has been run on the firmware yet.
 - Replace periodic database polling with a real-time update approach to reduce unnecessary requests and response delays.
 - Optimize the firmware and consider a larger application partition if additional features are introduced.
 
+
+## References and Acknowledgments
+
+- **Firebase Authentication REST API:** https://firebase.google.com/docs/reference/rest/auth
+- **Firebase Realtime Database REST API:** https://firebase.google.com/docs/reference/rest/database
+- **Firebase Realtime Database Security Rules:** https://firebase.google.com/docs/database/security
+- **ESP-IDF Programming Guide:** https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/
+- **MDN Web Docs – Web Speech API:** https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API
+- **Course Reference Project:** Smart Fan project using AWS IoT Core, AWS Lambda, and Alexa, which served as a reference for the project requirements and design.
+- **Acknowledgment:** Asst. Prof. Paul Rodolf P. Castor, M.Sc., for the course guidance and approval to use Firebase as an alternative to the originally proposed AWS services and Alexa.
+
