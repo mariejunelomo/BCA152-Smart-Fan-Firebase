@@ -107,6 +107,95 @@ speedButtons.forEach((button) => {
   });
 });
 
+/* ---------- Voice control (Web Speech API) ---------- */
+const micBtn = document.getElementById("mic-btn");
+const voiceFeedback = document.getElementById("voice-feedback");
+
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+/* Turns spoken text into a power level, or null if it is not a clear command. */
+function parseCommand(text) {
+  const words = text
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const found = new Set();
+
+  if (words.includes("off") || words.includes("stop")) found.add(0);
+  if (words.includes("low")) found.add(33);
+  if (words.includes("normal") || words.includes("medium")) found.add(66);
+  if (words.includes("high")) found.add(100);
+
+  // Only accept the command if exactly one speed was mentioned.
+  return found.size === 1 ? [...found][0] : null;
+}
+
+if (!SpeechRecognition) {
+  micBtn.disabled = true;
+  voiceFeedback.textContent =
+    "Voice control is not supported in this browser. Try Chrome or Edge.";
+} else {
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  micBtn.addEventListener("click", () => {
+    voiceFeedback.textContent = "";
+    try {
+      recognition.start();
+    } catch (error) {
+      console.error("Could not start listening:", error.name);
+    }
+  });
+
+  recognition.addEventListener("start", () => {
+    micBtn.classList.add("listening");
+    micBtn.textContent = "🎤 Listening...";
+    voiceFeedback.textContent = "Say: off, low, normal, or high.";
+  });
+
+  recognition.addEventListener("result", (event) => {
+    const heard = event.results[0][0].transcript.trim();
+    const level = parseCommand(heard);
+
+    if (level === null) {
+      voiceFeedback.textContent =
+        'Heard: "' + heard + '" - not a fan command. Try "high speed".';
+    } else {
+      voiceFeedback.textContent =
+        'Heard: "' + heard + '" - setting fan to ' + LEVEL_NAMES[level] + ".";
+      setLevel(level);
+    }
+  });
+
+  recognition.addEventListener("error", (event) => {
+    console.error("Speech error:", event.error);
+
+    if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+      voiceFeedback.textContent =
+        "Microphone access was blocked. Allow the microphone for this page and try again.";
+    } else if (event.error === "no-speech") {
+      voiceFeedback.textContent = "I didn't hear anything. Try again.";
+    } else if (event.error === "audio-capture") {
+      voiceFeedback.textContent = "No microphone was found.";
+    } else if (event.error === "network") {
+      voiceFeedback.textContent =
+        "Speech recognition needs an internet connection.";
+    } else if (event.error !== "aborted") {
+      voiceFeedback.textContent = "Voice recognition error. Please try again.";
+    }
+  });
+
+  recognition.addEventListener("end", () => {
+    micBtn.classList.remove("listening");
+    micBtn.textContent = "🎤 Voice command";
+  });
+}
+
 /* Runs whenever someone signs in or out. */
 onAuthStateChanged(auth, (user) => {
   if (user) {

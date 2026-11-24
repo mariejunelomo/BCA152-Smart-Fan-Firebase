@@ -178,3 +178,41 @@ button {
     animation-play-state: paused !important;
   }
 }
+
+/* ---------- Voice control ---------- */
+.mic-btn {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px;
+  font-weight: 600;
+  color: #e2e8f0;
+  background: #7c3aed;
+  border: none;
+  border-radius: 12px;
+}
+
+.mic-btn:hover {
+  background: #8b5cf6;
+}
+
+.mic-btn.listening {
+  background: #dc2626;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.mic-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6); }
+  50%      { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+}
+
+.voice-feedback {
+  min-height: 1.2em;
+  margin: 10px 0 0;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
