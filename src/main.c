@@ -165,6 +165,9 @@ static void initialize_wifi(void)
 #define HTTP_RESPONSE_MAX  4096
 #define ID_TOKEN_MAX       1536
 #define REFRESH_TOKEN_MAX  1024
+#define FIREBASE_URL_MAX   1800
+#define POLL_INTERVAL_MS   2000
+#define SIGN_IN_RETRY_MS   10000
 
 static char http_response[HTTP_RESPONSE_MAX];
 static int http_response_len = 0;
@@ -172,6 +175,8 @@ static int http_response_len = 0;
 static char firebase_id_token[ID_TOKEN_MAX];
 static char firebase_refresh_token[REFRESH_TOKEN_MAX];
 static int firebase_token_lifetime_s = 0;
+
+static char firebase_url[FIREBASE_URL_MAX];
 
 static esp_err_t http_event_handler(esp_http_client_event_t *evt)
 {
@@ -268,6 +273,69 @@ static esp_err_t firebase_sign_in(void)
     return result;
 }
 
+/* Reads /fan/powerlevel from the Realtime Database (REST API).
+   The URL contains the token, so it is never printed. */
+static esp_err_t firebase_read_power_level(int *level_out)
+{
+    esp_err_t result = ESP_FAIL;
+
+    http_response_len = 0;
+    http_response[0] = '\0';
+
+    size_t base_len = strlen(FIREBASE_DATABASE_URL);
+    while (base_len > 0 && FIREBASE_DATABASE_URL[base_len - 1] == '/') {
+        base_len--;
+    }
+
+    int n = snprintf(firebase_url, sizeof(firebase_url),
+                     "%.*s/fan/powerlevel.json?auth=%s",
+                     (int)base_len, FIREBASE_DATABASE_URL,
+                     firebase_id_token);
+    if (n < 0 || n >= (int)sizeof(firebase_url)) {
+        ESP_LOGE(TAG, "Database URL is too long.");
+        return ESP_ERR_INVALID_SIZE;
+    }
+
+    esp_http_client_config_t config = {
+        .url = firebase_url,
+        .method = HTTP_METHOD_GET,
+        .event_handler = http_event_handler,
+        .crt_bundle_attach = esp_crt_bundle_attach,
+        .timeout_ms = 10000,
+    };
+
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    if (client == NULL) {
+        return ESP_FAIL;
+    }
+
+    esp_err_t err = esp_http_client_perform(client);
+
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Database request failed: %s", esp_err_to_name(err));
+    } else {
+        int status = esp_http_client_get_status_code(client);
+
+        if (status != 200) {
+            ESP_LOGE(TAG, "Database HTTP status: %d", status);
+            ESP_LOGE(TAG, "Database reply: %s", http_response);
+        } else {
+            char *end = NULL;
+            long value = strtol(http_response, &end, 10);
+
+            if (end == http_response) {
+                ESP_LOGW(TAG, "Database value is not a number: %s", http_response);
+            } else {
+                *level_out = (int)value;
+                result = ESP_OK;
+            }
+        }
+    }
+
+    esp_http_client_cleanup(client);
+    return result;
+}
+
 static void firebase_task(void *pvParameters)
 {
     xEventGroupWaitBits(
@@ -278,16 +346,46 @@ static void firebase_task(void *pvParameters)
         portMAX_DELAY
     );
 
-    ESP_LOGI(TAG, "Signing in to Firebase...");
+    while (true) {
+        ESP_LOGI(TAG, "Signing in to Firebase...");
 
-    if (firebase_sign_in() == ESP_OK) {
-        ESP_LOGI(TAG, "Firebase sign-in OK. Token valid for %d seconds.",
-                 firebase_token_lifetime_s);
-    } else {
-        ESP_LOGE(TAG, "Firebase sign-in failed.");
+        if (firebase_sign_in() == ESP_OK) {
+            ESP_LOGI(TAG, "Firebase sign-in OK. Token valid for %d seconds.",
+                     firebase_token_lifetime_s);
+            break;
+        }
+
+        ESP_LOGE(TAG, "Firebase sign-in failed. Retrying in %d seconds.",
+                 SIGN_IN_RETRY_MS / 1000);
+        vTaskDelay(pdMS_TO_TICKS(SIGN_IN_RETRY_MS));
     }
 
-    vTaskDelete(NULL);
+    int last_level = -1;
+
+    while (true) {
+        xEventGroupWaitBits(
+            wifi_event_group,
+            WIFI_CONNECTED_BIT,
+            pdFALSE,
+            pdTRUE,
+            portMAX_DELAY
+        );
+
+        int level = 0;
+
+        if (firebase_read_power_level(&level) == ESP_OK) {
+            if (level != last_level) {
+                if (level == 0 || level == 33 || level == 66 || level == 100) {
+                    set_fan_power_level((uint8_t)level);
+                } else {
+                    ESP_LOGW(TAG, "Ignoring invalid value from Firebase: %d", level);
+                }
+                last_level = level;
+            }
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(POLL_INTERVAL_MS));
+    }
 }
 
 void app_main(void)
