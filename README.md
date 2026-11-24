@@ -59,3 +59,11 @@ The LED circuit has not been built yet, because no hardware was available during
 | LOW | 33 | GPIO 4 |
 | NORMAL | 66 | GPIO 5 |
 | HIGH | 100 | GPIO 6 |
+
+## Task Design
+
+| Task / handler | Role |
+|---|---|
+| `app_main` | Initializes NVS, LEDs and Wi-Fi, creates `firebase_task`, then returns |
+| `wifi_event_handler` | Connects, reconnects on disconnect, logs the IP address, sets or clears the connected flag |
+| `firebase_task` | Waits for Wi-Fi, signs in, polls `/fan/powerlevel` every 2 seconds, refreshes the token, and updates the LEDs |
