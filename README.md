@@ -22,3 +22,14 @@ The original reference project used AWS IoT Core, AWS Lambda, Alexa and relays. 
 - Use the Firebase Realtime Database REST API over HTTPS from an ESP32.
 - Protect a database with authenticated access rules and keep secrets out of Git.
 - Use the browser Web Speech API for voice control.
+
+## System Architecture
+
+```text
+Web page (buttons / microphone)  --writes-->  Firebase Realtime Database  <--reads--  ESP32-S3
+        /fan/powerlevel = 0 | 33 | 66 | 100                                 (updates the LEDs)
+```
+
+- The web page signs in with the Firebase Web SDK and writes `/fan/powerlevel`.
+- The ESP32 signs in with the Firebase Authentication REST API, then reads `/fan/powerlevel` over HTTPS every 2 seconds using the Realtime Database REST API.
+- The database rules decide who may read and write.
