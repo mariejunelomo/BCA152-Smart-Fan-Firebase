@@ -126,3 +126,8 @@ Then open `http://localhost:8000` in Chrome or Edge.
 
 Not done. No Wokwi simulation was created for this project.
 
+
+## Unit Testing
+
+Not done. No automated unit tests have been written yet.
+
