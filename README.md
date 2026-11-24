@@ -136,3 +136,16 @@ Not done. No automated unit tests have been written yet.
 
 Not done. No static analysis tool has been run on the firmware yet.
 
+
+## Functional Verification
+
+| Test | Result |
+|---|---|
+| Firmware builds using PlatformIO and ESP-IDF | Verified |
+| Web page login, buttons, and spinning fan at each level | Verified in the browser |
+| Voice commands for OFF, LOW, NORMAL, and HIGH | Verified in the browser |
+| Both accounts can read and write the fan value under the configured database rules | Verified |
+| Unsigned database read is refused (HTTP 401) | Verified |
+| ESP32 Wi-Fi, Firebase sign-in, database reading, and LED control | Not tested (hardware unavailable) |
+| ESP32 authentication token refresh after approximately one hour | Not tested (hardware unavailable) |
+
