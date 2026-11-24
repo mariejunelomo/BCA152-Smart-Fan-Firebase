@@ -71,3 +71,15 @@ The LED circuit has not been built yet, because no hardware was available during
 ## Inter-Task Communication
 
 A FreeRTOS event group (`wifi_event_group`) with the bit `WIFI_CONNECTED_BIT` links the Wi-Fi event handler and `firebase_task`. The handler sets the bit when the ESP32 gets an IP address and clears it when Wi-Fi disconnects. `firebase_task` waits on the bit before it makes any network request.
+
+## State Machine
+
+```text
+WAIT_FOR_WIFI --> SIGN_IN --> POLL (read /fan/powerlevel every 2 s, update LEDs)
+                     ^            |
+                     |            +--> token near expiry --> REFRESH TOKEN --(fails)--> SIGN_IN
+                     |            +--> database answers 401 ----------------------------> SIGN_IN
+                     +-- sign-in fails: wait 10 s and retry
+```
+
+If Wi-Fi drops, the task waits for the connected bit again before making the next request.
