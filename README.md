@@ -50,3 +50,12 @@ Web page (buttons / microphone)  --writes-->  Firebase Realtime Database  <--rea
 | Firebase (Authentication and Realtime Database) | Cloud link between the web page and the ESP32 |
 
 The LED circuit has not been built yet, because no hardware was available during development.
+
+## Pin Configuration
+
+| Fan state | Power level | GPIO |
+|---|---:|---:|
+| OFF | 0 | all LEDs off |
+| LOW | 33 | GPIO 4 |
+| NORMAL | 66 | GPIO 5 |
+| HIGH | 100 | GPIO 6 |
