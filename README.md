@@ -13,3 +13,12 @@ The original reference project used AWS IoT Core, AWS Lambda, Alexa and relays. 
 - The web page listens to Firebase live, so it updates when the value changes from anywhere.
 - ESP32 firmware (ESP-IDF) with Wi-Fi auto-reconnect, Firebase email/password sign-in, reading the fan level over HTTPS, token refresh, and re-sign-in when the database rejects the token.
 - Database rules that allow only two specific accounts and only the values 0, 33, 66 and 100.
+
+## Learning Objectives
+
+- Use ESP-IDF and PlatformIO to build ESP32-S3 firmware.
+- Use FreeRTOS tasks and event groups to coordinate Wi-Fi and cloud communication.
+- Authenticate a device and a web app with Firebase Authentication.
+- Use the Firebase Realtime Database REST API over HTTPS from an ESP32.
+- Protect a database with authenticated access rules and keep secrets out of Git.
+- Use the browser Web Speech API for voice control.
