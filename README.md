@@ -105,3 +105,19 @@ If Wi-Fi drops, the task waits for the connected bit again before making the nex
 3. Copy `database.rules.example.json` into the database Rules tab and replace `UID_ONE` and `UID_TWO` with the User UIDs of your two accounts.
 4. Copy `src/secrets.h.example` to `src/secrets.h` and fill in your Wi-Fi name and password, Firebase Web API key, database URL, and the email and password of one allowed account.
 5. Copy `web/firebase-config.example.js` to `web/firebase-config.js` and fill in the values from Firebase Project settings, Your apps, Config. The first line must be `export const firebaseConfig = {`.
+
+## Building the Project
+
+```powershell
+& "$env:USERPROFILE\.platformio\penv\Scripts\platformio.exe" run
+```
+
+The first build downloads the cJSON component, so it needs an internet connection.
+
+To run the web page locally:
+
+```powershell
+& "$env:USERPROFILE\.platformio\penv\Scripts\python.exe" -m http.server 8000 --directory web
+```
+
+Then open `http://localhost:8000` in Chrome or Edge.
